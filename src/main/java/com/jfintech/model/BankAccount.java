@@ -17,8 +17,22 @@ public class BankAccount {
         this.balance = balance;
     }
 
+    // Default constructor (Hàm khởi tạo mặc định)
+    public BankAccount() {}
+
     // Getters (Để Spring Boot có thể đọc dữ liệu và chuyển sang JSON)
     public Long getId() { return id; }
     public String getOwnerName() { return ownerName; }
     public Double getBalance() { return balance; }
+    //set balance
+    public void setBalance(Double balance) { this.balance = balance; }
+
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private java.util.List<Transaction> transactions;
+    public java.util.List<Transaction> getTransactions() {
+        return transactions;
+    }
+    public void setTransactions(java.util.List<Transaction> transactions) {
+        this.transactions = transactions;
+    }
 }
