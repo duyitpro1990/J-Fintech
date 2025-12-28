@@ -18,6 +18,7 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable()) // 1. Tắt chống giả mạo (quan trọng khi test API)
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/register").permitAll() // 1. Cho phép truy cập không cần đăng nhập đến /register
                 .anyRequest().authenticated() // 2. Tất cả mọi request đều phải đăng nhập
             )
             .httpBasic(withDefaults()); // 3. Dùng Basic Auth thay vì Form Login
