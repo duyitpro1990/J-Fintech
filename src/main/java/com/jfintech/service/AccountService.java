@@ -7,7 +7,6 @@ import com.jfintech.repository.AccountRepository;
 import com.jfintech.repository.TransactionRepository;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -106,11 +105,18 @@ public class AccountService {
     }
 
     //transferMoney method
-    public void transferMoney(Long fromAccountId, Long toAccountId, Double amount) {
+    public void transferMoney(Long fromAccountId, String toAccountNumber, Double amount) {
         BankAccount fromAccount = accountRepository.findById(fromAccountId)
                 .orElseThrow(() -> new RuntimeException("From account not found")); 
-        BankAccount toAccount = accountRepository.findById(toAccountId)
+        
+        //Tìm tài khoản nhận    
+        BankAccount toAccount = accountRepository.findByAccountNumber(toAccountNumber)
                 .orElseThrow(() -> new RuntimeException("To account not found"));
+
+        // --- FIX BUG: CHẶN CHUYỂN CHO CHÍNH MÌNH ---
+        if (fromAccount.getId().equals(toAccount.getId())) {
+            throw new RuntimeException("Không thể chuyển tiền cho chính tài khoản nguồn!");
+        }
         if (fromAccount.getBalance() < amount) {
             throw new RuntimeException("Insufficient funds");
         }
@@ -119,9 +125,9 @@ public class AccountService {
         accountRepository.save(fromAccount);
         accountRepository.save(toAccount);
         // Lưu lịch sử giao dịch
-        Transaction tx1 = new Transaction(fromAccount, -amount, "TRANSFER_OUT");
-        Transaction tx2 = new Transaction(toAccount, amount, "TRANSFER_IN");
+        Transaction tx1 = new Transaction(fromAccount, -amount, "TRANSFER_OUT (to " + toAccountNumber + ")");
+        Transaction tx2 = new Transaction(toAccount, amount, "TRANSFER_IN (from " + fromAccount.getAccountNumber() + ")");
         transactionRepository.save(tx1);
         transactionRepository.save(tx2);
-        }
+    }
 }

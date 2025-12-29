@@ -15,7 +15,7 @@ export default function Dashboard() {
   const [accounts, setAccounts] = useState<BankAccount[]>([]);
   const [selectedAccIdx, setSelectedAccIdx] = useState(0);
   const [amount, setAmount] = useState("");
-  const [toId, setToId] = useState("");
+  const [toAccountNumber, setToAccountNumber] = useState("");
   const [selectedTx, setSelectedTx] = useState<Transaction | null>(null);
 
   // Kiểm tra đăng nhập
@@ -60,8 +60,8 @@ export default function Dashboard() {
       let method = "POST"; 
 
       if (type === "transfer") {
-        if(!toId) return alert("Vui lòng nhập ID người nhận!");
-        url = `${API_BASE}/transfer?fromId=${currentAcc.id}&toId=${toId}&amount=${amount}`;
+        if(!toAccountNumber) return alert("Vui lòng nhập số tài khoản người nhận!");
+        url = `${API_BASE}/transfer?fromId=${currentAcc.id}&toAccountNumber=${toAccountNumber}&amount=${amount}`;
       } else {
         method = "PUT";
         url = `${API_BASE}/accounts/${currentAcc.id}/${type}?amount=${amount}`;
@@ -72,7 +72,7 @@ export default function Dashboard() {
       if (res.ok) {
         alert("Giao dịch thành công!");
         setAmount("");
-        setToId("");
+        setToAccountNumber("");
         fetchData();
       } else {
         const err = await res.json();
@@ -143,10 +143,10 @@ export default function Dashboard() {
                <input
                 type="number"
                 min={0}
-                placeholder="Nhập ID người nhận (chỉ dùng khi chuyển khoản)"
+                placeholder="Nhập số tài khoản người nhận (chỉ dùng khi chuyển khoản)"
                 className="w-full p-4 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm font-medium"
-                value={toId}
-                onChange={(e) => setToId(e.target.value)}
+                value={toAccountNumber}
+                onChange={(e) => setToAccountNumber(e.target.value)}
               />
             </div>
 
@@ -224,7 +224,7 @@ export default function Dashboard() {
                       </div>
                     </div>
                     <div className={`font-extrabold text-lg ${isPlus ? "text-green-600" : "text-red-500"}`}>
-                      {isPlus ? "+" : "-"} {formatMoney(tx.amount)}
+                      {isPlus ? "+" : ""} {formatMoney(tx.amount)}
                     </div>
                   </div>
                 );

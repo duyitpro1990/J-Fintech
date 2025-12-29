@@ -102,20 +102,19 @@ public class HelloController {
 
     //API chuyển tiền giữa các tài khoản
     @PostMapping("/transfer")
-    public String transferMoney(@RequestParam Long fromId, @RequestParam Long toId, @RequestParam Double amount, Principal principal) {
+    public String transferMoney(@RequestParam Long fromId, @RequestParam String toAccountNumber, @RequestParam Double amount, Principal principal) {
         // Lấy thông tin người dùng hiện tại
         String currentUsername = principal.getName();
         User currentUser = userRepository.findByUsername(currentUsername)
                 .orElseThrow(() -> new RuntimeException("User không tồn tại"));
 
         // Kiểm tra quyền sở hữu tài khoản nguồn
-        BankAccount fromAccount = accountService.getAccountById(fromId);
-        if (!fromAccount.getUser().getId().equals(currentUser.getId())) {
-            throw new RuntimeException("Bạn không có quyền truy cập vào tài khoản này");
-        }
+        boolean isOwner = accountService.getAccountsByUser(currentUser).stream()
+                .anyMatch(account -> account.getId().equals(fromId));
+        if (!isOwner) throw new RuntimeException("Bạn không có quyền truy cập tài khoản này.");
 
         // Thực hiện chuyển tiền
-        accountService.transferMoney(fromId, toId, amount);
+        accountService.transferMoney(fromId, toAccountNumber, amount);
         return "Chuyển tiền thành công!";
     }
 }

@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import java.util.Optional;
 
 @Repository
 // JpaRepository<Kiểu dữ liệu, Kiểu của ID>
@@ -17,4 +18,6 @@ public interface AccountRepository extends JpaRepository<BankAccount, Long> {
     List<BankAccount> findByUser(User user);
     long countByCreatedAt(LocalDate date);
     boolean existsByAccountNumber(String accountNumber);
+    // Tìm tài khoản theo số tài khoản
+    Optional<BankAccount> findByAccountNumber(String accountNumber);
 }
